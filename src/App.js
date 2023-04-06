@@ -1,24 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import { ColorModeContext,useMode } from "./theme";
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import Topbar from "./pages/globar/Topbar";
+import Dashboard  from "./pages/dashboard/Dashboard";
+import Sidebars from "./pages/globar/Sidebar"
+import { Route, Routes } from "react-router-dom";
+import User from "./pages/userPage/User";
+import UserAdd from "./pages/userPage/UserAdd";
+import Category from "./pages/categoryPage/Category";
+import Food from "./pages/foodPage/Food";
+import Oder from "./pages/oderPage/Oder";
+import OrderComplete from "./pages/orderComplete/OrderComplete";
+
 
 function App() {
+  const [theme,colorMode] = useMode();
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline/>
+        <div className="App" >
+          <Sidebars/>
+          <main className="content">
+            <Topbar/>
+            <Routes>
+                <Route index path="/" element={<Dashboard/>} />
+                <Route path="/user" element={<User/>} />
+                <Route path="/user/userAdd" element={<UserAdd/>} />
+                <Route path="/category" element={<Category/>} />
+                <Route path="/food" element={<Food/>} />
+                <Route path="/oder" element={<Oder/>} />
+                <Route path="/orderComplete" element={<OrderComplete/>} />   
+            </Routes>
+          </main>
+        </div>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
 
