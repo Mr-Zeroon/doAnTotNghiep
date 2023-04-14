@@ -38,6 +38,7 @@ const UserAdd = () => {
     navigate("/user")
     
   }
+  
   return (
     <Box m="20px">
       <Header  title="User" subtitle="User Management"/>
