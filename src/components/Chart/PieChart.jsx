@@ -2,7 +2,7 @@ import React from 'react'
 import { ResponsivePie } from '@nivo/pie'
 import { useTheme } from '@mui/material'
 import {tokens} from "../../theme"
-import {user as data} from "../../apis/user"
+
 const PieChart = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode)

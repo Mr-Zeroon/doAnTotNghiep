@@ -1,5 +1,5 @@
 import { Box,useTheme,Button,IconButton,Typography } from '@mui/material'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../../components/Header/Header'
 import {tokens} from "../../theme"
 import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
@@ -10,31 +10,65 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import VNChart from '../../components/Chart/VNChart';
 import BarChart from '../../components/Chart/BarChart';
 import StartBox from '../../components/StartBox.jsx/StartBox';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../firebase';
+import { useMemo } from 'react';
 
 
 const Dashboard = () => {
   const theme = useTheme();
+  const [user,setUser] = useState([])
   const colors = tokens(theme.palette.mode)
 
+  const fetchPost = async () => {  
+    await getDocs(collection(db, "/users"))
+        .then((querySnapshot)=>{               
+            const newData = querySnapshot.docs
+                .map((doc) => ({...doc.data(), id:doc.id }));
+            setUser(newData);
+        }) 
+      }
+  useEffect(()=>{
+    fetchPost();
+  }, [])
+      const handleCountUser = useMemo(() => {
+        return user.reduce((a,b) => {
+          
+          if(b.typeUser === "ADMIN") {
+            return {
+              ...a,
+              admin: (a.admin || 0) + 1
+            }
+           
+          }
+          if(b.typeUser === "CUSTOMER") {
+            return {
+              ...a,
+              customer: (a.customer || 0) + 1
+            }
+            
+          }
+          if(b.typeUser === "STORE") {
+            return {
+              ...a,
+              store: (a.store || 0) + 1
+            }
+            
+          }
+          if(b.typeUser === "SHIPPER") {
+            return {
+              ...a,
+              shipper: (a.shipper || 0) + 1
+            }
+            
+          }
+          return {...a}
+        }, {})
+      },[user])
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard"/>
-      
-        <Box>
-          <Button
-            sx={{
-              backgroundColor:colors.blueAccent[700],
-              color:colors.grey[100],
-              fontSize:"14px",
-              fontWeight:"bold",
-              padding:"10px 20px"
-            }}
-          >
-            <DownloadOutlinedIcon sx={{mr:"10px"}} />
-            Download Reports
-          </Button>
-        </Box>
       </Box>
  {/* GRID & CHARTS */}
       <Box
@@ -53,8 +87,8 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StartBox
-            title="55"
-            subtitle="User"
+            title={handleCountUser.customer}
+            subtitle="Customer"
             progress="0.75"
             increase="+14%"
             icon={
@@ -73,7 +107,7 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StartBox
-            title="9"
+            title={handleCountUser.shipper}
             subtitle="Shipper"
             progress="0.5"
             increase="+14%"
@@ -93,7 +127,7 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StartBox
-            title="6"
+            title={handleCountUser.store}
             subtitle="Store"
             progress="0.25"
             increase="+14%"
@@ -113,7 +147,7 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StartBox
-            title="5"
+            title={handleCountUser.admin}
             subtitle="Admin"
             progress="1"
             increase="+14%"
@@ -121,7 +155,7 @@ const Dashboard = () => {
               <AdminPanelSettingsOutlinedIcon
                 sx={{ color:colors.greenAccent[600],fontSize:"26px"}}
               />
-            }
+            }         
           />
         </Box>
 
@@ -166,9 +200,6 @@ const Dashboard = () => {
             backgroundColor={colors.primary[400]}
             p="30px"
           >
-            <Typography variant='h5' fontWeight="600" sx={{ marginBottom: "15px" }}>
-                VietNam Based Traffic
-            </Typography>
             <Box height="200px">
               <VNChart isDashboard={true} />
             </Box> 

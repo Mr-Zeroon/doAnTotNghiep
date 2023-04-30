@@ -1,40 +1,38 @@
-import { ColorModeContext,useMode } from "./theme";
-import { CssBaseline, ThemeProvider } from "@mui/material";
-import Topbar from "./pages/globar/Topbar";
-import Dashboard  from "./pages/dashboard/Dashboard";
-import Sidebars from "./pages/globar/Sidebar"
-import { Route, Routes } from "react-router-dom";
+import { Routes, Route } from 'react-router-dom';
 import User from "./pages/userPage/User";
 import UserAdd from "./pages/userPage/UserAdd";
 import Category from "./pages/categoryPage/Category";
-import Food from "./pages/foodPage/Food";
-import Oder from "./pages/oderPage/Oder";
+import CategoryAdd from "./pages/categoryPage/CategoryAdd";
 import OrderComplete from "./pages/orderComplete/OrderComplete";
-
+import UserEdit from "./pages/userPage/UserEdit";
+import Order from "./pages/Order/Order";
+import CategoryEdit from "./pages/categoryPage/CategoryEdit";
+import Dashboard  from "./pages/dashboard/Dashboard";
+import AdminLayout from './layouts/AdminLayout';
+import Login from './pages/LoginPage/Login';
 
 function App() {
-  const [theme,colorMode] = useMode();
+  
   return (
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline/>
-        <div className="App" >
-          <Sidebars/>
-          <main className="content">
-            <Topbar/>
-            <Routes>
-                <Route index path="/" element={<Dashboard/>} />
-                <Route path="/user" element={<User/>} />
-                <Route path="/user/userAdd" element={<UserAdd/>} />
-                <Route path="/category" element={<Category/>} />
-                <Route path="/food" element={<Food/>} />
-                <Route path="/oder" element={<Oder/>} />
-                <Route path="/orderComplete" element={<OrderComplete/>} />   
-            </Routes>
-          </main>
-        </div>
-      </ThemeProvider>
-    </ColorModeContext.Provider>
+      <div>
+      <Routes>
+        <Route path="/login" element={<Login/>} />
+      </Routes>
+      <Routes>
+        <Route path='/' element={<AdminLayout/>}>
+          <Route index element={<Dashboard/>} />
+          <Route path="/user" element={<User/>} />
+          <Route path="/user/userAdd" element={<UserAdd/>} />
+          <Route path="/user/:editID" element={<UserEdit/>} />
+          <Route path="/category" element={<Category/>} />
+          <Route path="/category/Add" element={<CategoryAdd/>} />
+          <Route path="/category/:editID" element={<CategoryEdit/>} />
+          <Route path="/order" element={<Order/>} />
+          <Route path="/orderComplete" element={<OrderComplete/>} />
+        </Route>   
+      </Routes>
+    </div>
+    
   );
 }
 

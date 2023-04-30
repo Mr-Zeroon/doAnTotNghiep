@@ -3,20 +3,11 @@ import { Formik } from 'formik';
 import * as yup from "yup";
 import { Box, TextField,Button,Select,MenuItem,InputLabel,FormControl } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header/Header';
-import { v1 as uuidv1 } from 'uuid';
-import { collection, addDoc } from "firebase/firestore";
+import { collection, doc, updateDoc, query, where } from "firebase/firestore";
 import {db} from '../../firebase';
-const initialValues = {
-  id:uuidv1(),
-  fullName:"",
-  phone:"",
-  passWord:"",
-  email:"",
-  typeUser:"CUSTOMER",
-  isDeleted:false
-}
+
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 const userSchema = yup.object().shape({
   id:yup.string().required("required"),
@@ -27,22 +18,34 @@ const userSchema = yup.object().shape({
   typeUser:yup.string().required("Did not enter the typeUser"),
 })
 
-const UserAdd = () => {
+const UserEdit = () => {
   const navigate = useNavigate()
+
+  const {editID} = useParams()
   const isNorMobile = useMediaQuery("(min-width:600px)")
-  
-  const handleFormSubmit = async (value)=>{
-    await addDoc(collection(db, "/users"), {
-      id:value.id,
-      fullName:value.fullName,
-      phone:value.phone,
-      passWord:value.passWord,
-      email:value.email,
-      typeUser:value.typeUser,
-      isDeleted:false 
-    })
+  const initialValues = {
+    id:editID,
+    fullName:"",
+    phone:"",
+    passWord:"",
+    email:"",
+    typeUser:"ADMIN",
+  }
+  const handleFormSubmit = async (value) => {  
+        query(collection(db, "/users"), where("id", "==", editID));
+        const user = doc(db, "/users", editID);
+        await updateDoc(user, {
+          id:editID,
+          fullName:value.fullName,
+          phone:value.phone,
+          passWord:value.passWord,
+          email:value.email,
+          typeUser:value.typeUser,
+          isDeleted:false 
+        });  
     navigate("/user") 
   }
+   
   
   const handleBack =()=>{
     navigate("/user") 
@@ -128,6 +131,7 @@ const UserAdd = () => {
              <FormControl fullWidth sx={{gridColumn:"span 4"}}>
                 <InputLabel >Type User</InputLabel>
                 <Select
+                    
                     variant='filled'
                     label= "Type User"
                     onBlur={handleBlur}
@@ -136,14 +140,11 @@ const UserAdd = () => {
                     name="typeUser"
                 >
                     <MenuItem value="ADMIN">ADMIN</MenuItem>
-                    <MenuItem value="SHIPPER">SHIPPER</MenuItem>
-                    <MenuItem value="CUSTOMER">CUSTOMER</MenuItem>
-                    <MenuItem value="STORE">STORE</MenuItem>
                 </Select>
               </FormControl>
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color='secondary' variant='contained'>ADD</Button>
+              <Button type="submit" color='secondary' variant='contained'>UPDATE</Button>
             </Box>
           </form>
         )}
@@ -152,4 +153,4 @@ const UserAdd = () => {
   )
 }
 
-export default UserAdd
+export default UserEdit

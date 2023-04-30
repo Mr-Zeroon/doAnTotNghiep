@@ -2,7 +2,7 @@ import React from 'react'
 import { ResponsiveBar } from '@nivo/bar'
 import { useTheme } from '@mui/material'
 import {tokens} from "../../theme"
-import {user as data} from "../../apis/user"
+import {mockVNData as data} from "../../apis/mockVNData"
 
 const BarChart = ({isDashboard = false}) => {
     const theme = useTheme();

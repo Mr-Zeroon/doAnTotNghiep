@@ -7,9 +7,6 @@ import { mockVNData as data } from '../../apis/mockVNData'
 const VNChart = ({isDashboard = false}) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode)
-    
-    console.log(data,"dataVN");
-    console.log(mockGeoFeatures.features,"sad");
   return (
     <ResponsiveChoropleth
         data={data}

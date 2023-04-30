@@ -7,11 +7,11 @@ import { tokens } from '../../theme';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';
 import CategoryIcon from '@mui/icons-material/Category';
-import FastfoodIcon from '@mui/icons-material/Fastfood';
+// import FastfoodIcon from '@mui/icons-material/Fastfood';
 import FoodBankIcon from '@mui/icons-material/FoodBank';
 import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
-
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 const Item = ({title, to, icon, selected, setSelected}) =>{
   const theme = useTheme();
   const colors = tokens(theme.palette.mode)
@@ -28,6 +28,7 @@ const Sidebars = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed,setIsCollapsed] = useState(false)
   const [selected,setSelected] = useState("Dashboard")
+  
   return (
     <Box height="100%"
       sx={{
@@ -115,7 +116,7 @@ const Sidebars = () => {
                 selected={selected}
                 setSelected={setSelected}
               />
-              
+              <Typography>Page</Typography>
               <Item 
                 title="User"
                 to="user"
@@ -131,13 +132,6 @@ const Sidebars = () => {
                 setSelected={setSelected}
               />
               <Item 
-                title="Food"
-                to="food"
-                icon={<FastfoodIcon/>}
-                selected={selected}
-                setSelected={setSelected}
-              />
-              <Item 
                 title="Order"
                 to="order"
                 icon={<FoodBankIcon/>}
@@ -148,6 +142,14 @@ const Sidebars = () => {
                 title="Order Complete"
                 to="orderComplete"
                 icon={<DinnerDiningIcon/>}
+                selected={selected}
+                setSelected={setSelected}
+              />
+              <Typography>Function</Typography>
+              <Item 
+                title="Logout"
+                to="login"
+                icon={<LogoutOutlinedIcon/>}
                 selected={selected}
                 setSelected={setSelected}
               />

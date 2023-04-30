@@ -1,53 +1,63 @@
 import { Box,useTheme,Button, Typography } from '@mui/material';
 import { DataGrid,GridToolbar } from '@mui/x-data-grid';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../../components/Header/Header';
 import { tokens } from '../../theme';
 import { useNavigate } from 'react-router-dom';
-import { user } from '../../apis/user';
 import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import StoreMallDirectoryIcon from '@mui/icons-material/StoreMallDirectory';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-
+import { collection, getDocs, doc, deleteDoc, where, query, updateDoc } from "firebase/firestore";
+import {db} from '../../firebase'
 const User = () => {
   const navigate = useNavigate();
+  const [user,setUser] = useState([])
   const theme = useTheme();
   const colors = tokens(theme.palette.mode)
   const handleAdd = (e)=>{
     e.preventDefault();
     navigate("/user/userAdd")
   }
+  const fetchPost = async () => {  
+    await getDocs(collection(db, "/users"))
+        .then((querySnapshot)=>{               
+            const newData = querySnapshot.docs
+                .map((doc) => ({...doc.data(), id:doc.id }));
+            setUser(newData);
+        }) 
+      }
+  useEffect(()=>{
+    fetchPost();
+  }, [])
   const columns = [
-    {field:"id", headerName:"id",flex:0.5},
-    {field:"fullName", headerName:"Name",flex:1,cellClassName:"name-column-cell"},
-    {field:"phoneNumber", headerName:"Phone Number",flex:1},
-    {field:"password", headerName:"Password",flex:1},
-    {field:"avatar", headerName:"Avatar",flex:1},
-    {field:"address", headerName:"Address",flex:1},
+    {field:"id", headerName:"ID",flex:0.5},
+    {field:"fullName", headerName:"Name",flex:0.7,cellClassName:"name-column-cell"},
+    {field:"phone", headerName:"Phone Number",flex:0.5},
+    {field:"email", headerName:"Email",flex:1},
     {field:"typeUser", 
     headerName:"Type User",
-    flex:1,
+    flex:0.8,
     renderCell:({row:{ typeUser }})=>{
       return (
         <Box
-          width="90%"
+          width="80%"
           p="5px"
           display="flex"
           justifyContent="center"
           backgroundColor={
-            typeUser==="Admin"
+            typeUser==="ADMIN"
             ?colors.greenAccent[600]
             :colors.greenAccent[700]
             
           }
           borderRadius="4px"
           >
-          {typeUser==="Admin" && <AdminPanelSettingsOutlinedIcon/>}
-          {typeUser==="Customer" && <PersonIcon/>}
-          {typeUser==="Store" && <StoreMallDirectoryIcon/>}
-          {typeUser==="Shipper" && <LocalShippingIcon/>}
-          <Typography color={colors.grey[100]} sx={{ml:"5px"}}>
+          {typeUser==="ADMIN" && <AdminPanelSettingsOutlinedIcon/>}
+          {typeUser==="CUSTOMER" && <PersonIcon/>}
+          {typeUser==="STORE" && <StoreMallDirectoryIcon/>}
+          {typeUser==="SHIPPER" && <LocalShippingIcon/>}
+          <Typography color={colors.grey[100]} sx={{ml:"0px"}}>
             {typeUser}
           </Typography>
         </Box>
@@ -60,17 +70,62 @@ const User = () => {
       disableClickEventBubbling: true,
       
       renderCell: (params) => {
-          const onClick = (e) => {
-            const currentRow = params.row;
-            return alert(JSON.stringify(currentRow, null, 4));
+        const currentRow = params.row;
+        
+          const handleEdit = () => {
+            const currentRow = params.row;           
+              navigate(`/user/${currentRow.id}`)
           };
-          
+          const handleDelete = async (e) =>{
+            const currentRow = params.row;                       
+              await deleteDoc(doc(db, "/users", currentRow.id));
+              fetchPost();
+          }
+
+          const handleLock = async (e) =>{         
+            if(currentRow.typeUser!=="ADMIN" && currentRow.isDeleted === false){             
+               query(collection(db, "/users"), where("id", "==", currentRow.id));
+                const user = doc(db, "/users", currentRow.id);
+                await updateDoc(user, {
+                  id:currentRow.id,
+                  fullName:currentRow.fullName,
+                  phone:currentRow.phone,
+                  passWord:currentRow.passWord,
+                  email:currentRow.email,
+                  typeUser:currentRow.typeUser,
+                  isDeleted:true 
+                });
+            }
+            else if(currentRow.typeUser!=="ADMIN" && currentRow.isDeleted===true){             
+               query(collection(db, "/users"), where("id", "==", currentRow.id));
+                const user = doc(db, "/users", currentRow.id);
+                await updateDoc(user, {
+                  id:currentRow.id,
+                  fullName:currentRow.fullName,
+                  phone:currentRow.phone,
+                  passWord:currentRow.passWord,
+                  email:currentRow.email,
+                  typeUser:currentRow.typeUser,
+                  isDeleted:false 
+                });
+            }
+            fetchPost();
+          }
           return (
-            <Box direction="row" spacing={2} display="flex" gap="5px">
-              <Button variant="contained" color="warning" size="small" onClick={onClick}>Edit</Button>
-              <Button variant="contained" color="error" size="small" onClick={onClick}>Delete</Button>
+            <Box>
+             { 
+             (currentRow.typeUser==="ADMIN")
+             ?(
+              <Box direction="row" spacing={2} display="flex" gap="5px" >
+                <Button variant="contained" color="success" size="small" onClick={handleEdit}>Edit</Button>
+                <Button variant="contained" color="error" size="small" onClick={handleDelete}>Delete</Button>
+              </Box>
+             )
+             :(<Button variant="contained" color="warning" size="small" onClick={handleLock}>{currentRow.isDeleted===true?"UnLock":"Lock"}</Button>)
+             }
             </Box>
           );
+          
       },
     }
 

@@ -1,7 +1,6 @@
 import React from 'react'
 import { useTheme } from '@mui/material'
 import {tokens} from "../../theme"
-import {user as data} from "../../apis/user"
 import { ResponsiveLine } from '@nivo/line'
 
 const LineChart = ({isDashboard = false}) => {
