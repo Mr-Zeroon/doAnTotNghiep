@@ -5,8 +5,11 @@ import { Box, TextField,Button,Select,MenuItem,InputLabel,FormControl } from '@m
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header/Header';
-import { collection, doc, updateDoc, query, where } from "firebase/firestore";
+import { collection, doc, updateDoc, query, where, getDocs } from "firebase/firestore";
 import {db} from '../../firebase';
+import { toast } from 'react-toastify';
+import { useState } from 'react';
+import { useEffect } from 'react';
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 const userSchema = yup.object().shape({
@@ -20,7 +23,6 @@ const userSchema = yup.object().shape({
 
 const UserEdit = () => {
   const navigate = useNavigate()
-
   const {editID} = useParams()
   const isNorMobile = useMediaQuery("(min-width:600px)")
   const initialValues = {
@@ -31,20 +33,43 @@ const UserEdit = () => {
     email:"",
     typeUser:"ADMIN",
   }
+  const [user,setUser] = useState([])
+  const fetchPost = async () => {  
+    await getDocs(collection(db, "/users"))
+        .then((querySnapshot)=>{               
+            const newData = querySnapshot.docs
+                .map((doc) => ({...doc.data(), id:doc.id }));
+            setUser(newData);
+        }) 
+      }
+  useEffect(()=>{
+    fetchPost();
+  }, [])
+
   const handleFormSubmit = async (value) => {  
-        query(collection(db, "/users"), where("id", "==", editID));
-        const user = doc(db, "/users", editID);
-        await updateDoc(user, {
-          id:editID,
-          fullName:value.fullName,
-          phone:value.phone,
-          passWord:value.passWord,
-          email:value.email,
-          typeUser:value.typeUser,
-          isDeleted:false 
-        });  
-    navigate("/user") 
-  }
+    if(user.find(u=>u.email===value.email && u.id!==value.id))
+    {
+      toast.error("Email already exists")
+    }
+    else{
+      var bcrypt = require('bcryptjs');
+      bcrypt.hash(value.passWord, 10, async function  (err, hash)  {
+            query(collection(db, "/users"), where("id", "==", editID));
+              const user = doc(db, "/users", editID);
+              await updateDoc(user, {
+                fullName:value.fullName,
+                phone:value.phone,
+                passWord:hash,
+                email:value.email,
+                typeUser:value.typeUser,
+                isDeleted:false 
+              });  
+          toast.success("Update User Success");
+          navigate("/user") 
+        });
+      }
+    }
+        
    
   
   const handleBack =()=>{
@@ -105,7 +130,7 @@ const UserEdit = () => {
                 fullWidth
                 variant='filled'
                 type='password'
-                label="passWord"
+                label="Password"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.passWord}

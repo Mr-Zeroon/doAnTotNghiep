@@ -10,6 +10,7 @@ import StoreMallDirectoryIcon from '@mui/icons-material/StoreMallDirectory';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { collection, getDocs, doc, deleteDoc, where, query, updateDoc } from "firebase/firestore";
 import {db} from '../../firebase'
+import { toast } from 'react-toastify';
 const User = () => {
   const navigate = useNavigate();
   const [user,setUser] = useState([])
@@ -79,6 +80,7 @@ const User = () => {
           const handleDelete = async (e) =>{
             const currentRow = params.row;                       
               await deleteDoc(doc(db, "/users", currentRow.id));
+              toast.error("Delete User success");
               fetchPost();
           }
 
@@ -95,6 +97,7 @@ const User = () => {
                   typeUser:currentRow.typeUser,
                   isDeleted:true 
                 });
+                toast.success("Lock User success");
             }
             else if(currentRow.typeUser!=="ADMIN" && currentRow.isDeleted===true){             
                query(collection(db, "/users"), where("id", "==", currentRow.id));
@@ -108,6 +111,7 @@ const User = () => {
                   typeUser:currentRow.typeUser,
                   isDeleted:false 
                 });
+                toast.success("Unlock User success");
             }
             fetchPost();
           }

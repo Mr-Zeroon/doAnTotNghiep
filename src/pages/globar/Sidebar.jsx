@@ -2,16 +2,16 @@ import React, { useState } from 'react'
 import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import { Box, IconButton,Typography,useTheme } from '@mui/material';
 import 'react-pro-sidebar/dist/css/styles.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { tokens } from '../../theme';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';
 import CategoryIcon from '@mui/icons-material/Category';
-// import FastfoodIcon from '@mui/icons-material/Fastfood';
 import FoodBankIcon from '@mui/icons-material/FoodBank';
 import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import LoyaltyOutlinedIcon from '@mui/icons-material/LoyaltyOutlined';
 const Item = ({title, to, icon, selected, setSelected}) =>{
   const theme = useTheme();
   const colors = tokens(theme.palette.mode)
@@ -26,11 +26,18 @@ const Item = ({title, to, icon, selected, setSelected}) =>{
 const Sidebars = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const navigate = useNavigate()
   const [isCollapsed,setIsCollapsed] = useState(false)
   const [selected,setSelected] = useState("Dashboard")
+  const currentUser = JSON.parse(localStorage.getItem("admin"))||[]
   
+  const handleLogout = ()=>{
+    navigate("/login")
+    localStorage.setItem("admin",JSON.stringify(null));
+    console.log("click");
+  }
   return (
-    <Box height="100%"
+    <Box height="670px"
       sx={{
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important` 
@@ -94,10 +101,10 @@ const Sidebars = () => {
                     variant="h2" 
                     color={colors.grey[100]} 
                     fontWeight="bold" 
-                    sx={{m:" 10px 0 0 0"}}>Ta Hong Duc</Typography>
+                    sx={{m:" 10px 0 0 0"}}>{currentUser[0]?.fullName}</Typography>
                   <Typography 
                     variant="h5" 
-                    color={colors.greenAccent[500]} >Nghe An</Typography>
+                    color={colors.greenAccent[500]} >{currentUser[0]?.phone}</Typography>
                 </Box>
               </Box>
             )
@@ -145,14 +152,17 @@ const Sidebars = () => {
                 selected={selected}
                 setSelected={setSelected}
               />
-              <Typography>Function</Typography>
               <Item 
-                title="Logout"
-                to="login"
-                icon={<LogoutOutlinedIcon/>}
+                title="Voucher"
+                to="voucher"
+                icon={<LoyaltyOutlinedIcon/>}
                 selected={selected}
                 setSelected={setSelected}
               />
+              <Typography>Function</Typography>
+              <MenuItem style={{color:colors.grey[100]}} >
+                <Typography onClick={handleLogout} display="flex" gap="15px" ml="5px"><LogoutOutlinedIcon/> Logout</Typography>
+              </MenuItem>
            </Box>
         </Menu>
       </ProSidebar>

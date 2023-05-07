@@ -1,12 +1,13 @@
-import { Box,useTheme,Button, Typography } from '@mui/material';
+import { Box,useTheme,Button } from '@mui/material';
 import { DataGrid,GridToolbar } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react'
 import Header from '../../components/Header/Header';
 import { tokens } from '../../theme';
 import { useNavigate } from 'react-router-dom';
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, updateDoc, where } from "firebase/firestore";
 import {db} from '../../firebase'
-import { doc, deleteDoc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
+import { toast } from 'react-toastify';
 
 const Category = () => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const Category = () => {
   const columns = [
     {field:"id", headerName:"ID",flex:0.6},
     {field:"name", headerName:"Name",flex:0.5,cellClassName:"name-column-cell"},
-    {field:"thumnail", headerName:"Image",flex:1},
+    {field:"thumnail", headerName:"Image",flex:0.5 ,renderCell: (params) => <img src={params.value} style={{height:"50px",width:"100px"}}/>},
     {field: 'action',
       headerName: 'Action',
       width: 180,
@@ -42,24 +43,34 @@ const Category = () => {
       disableClickEventBubbling: true,
       
       renderCell: (params) => {
-          const onClick = (e) => {
-            const currentRow = params.row;
-            return alert(JSON.stringify(currentRow, null, 4));
-          };
+        const currentRow = params.row;
           const handleDelete = async (e) =>{
-            const currentRow = params.row;
-            await deleteDoc(doc(db, "/categorys", currentRow.id));
-            fetchPost();
+            if( currentRow.isDeleted === false){             
+              query(collection(db, "/categorys"), where("id", "==", currentRow.id));
+               const category = doc(db, "/categorys", currentRow.id);
+               await updateDoc(category, {
+                 isDeleted:true 
+               });
+               toast.success("Lock Category Success");
+           }
+           else if(currentRow.isDeleted===true){             
+              query(collection(db, "/categorys"), where("id", "==", currentRow.id));
+               const category = doc(db, "/categorys", currentRow.id);
+               await updateDoc(category, {
+                 isDeleted:false 
+               });
+               toast.success("Unlock Category Success");
+           }
+           fetchPost();
           }
-          const handleEdit = () => {
-            const currentRow = params.row;           
+          const handleEdit = () => {           
               navigate(`/category/${currentRow.id}`)
           };
          
           return (
             <Box direction="row" spacing={2} display="flex" gap="5px">
               <Button variant="contained" color="warning" size="small" onClick={handleEdit}>Edit</Button>
-              <Button variant="contained" color="error" size="small" onClick={handleDelete}>Delete</Button>
+              <Button variant="contained" color="error" size="small" onClick={handleDelete}>{currentRow.isDeleted===true?"UnLock":"Lock"}</Button>
             </Box>
           );
       },

@@ -1,41 +1,56 @@
 import './Login.css'
 import { linearGradientDef } from '@nivo/core'
-import { signInWithEmailAndPassword } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
-import React,{ useState,useContext } from 'react'
-import { auth } from '../../firebase';
-import {AuthContext} from '../../apis/AuthContext'
+import React,{ useState } from 'react'
+import { db } from '../../firebase';
+import { collection, getDocs } from 'firebase/firestore'
+import { useEffect } from 'react'
+import { toast } from 'react-toastify'
 
 const Login = () => {
- const [error, setError] = useState(false)
+  const [user,setUser] = useState([])
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const navigate = useNavigate()
-  const {dispatch} = useContext(AuthContext)
+  const fetchPost = async () => {  
+    await getDocs(collection(db, "/users"))
+        .then((querySnapshot)=>{               
+            const newData = querySnapshot.docs
+                .map((doc) => ({...doc.data(), id:doc.id }));
+            setUser(newData);
+        }) 
+      }
+  useEffect(()=>{
+    fetchPost();
+  }, [])
+
   const handleLogin = (e) => {
     e.preventDefault();
-    signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed in 
-      const user = userCredential.user;
-      dispatch({type:"LOGIN", payload:user})
-      navigate("/user")
-    })
-    .catch((error) => {
-      setError(true)
-    });
+    if(user.find(u=>u.email===email&& u.passWord===password&&u.typeUser==="ADMIN"))
+    {
+      const admin = user.filter(u=>u.email===email)
+      navigate('/')
+      localStorage.setItem("admin",JSON.stringify(admin));
+    }
+    else if(user.find(u=>u.email===email&& u.passWord===password&&u.typeUser!=="ADMIN")){
+      toast.error("You are not authorized to enter this website")
+    }
+    else {
+      toast.error("Email or password is incorrect")
+    }
+
   }
   return (
     <div className='m'>
         <div className="login-box" style={{background:linearGradientDef("#141e30", "#243b55")}}>
         <h2>Login</h2>
-        <form>
+        <form onClick={handleLogin}>
         <div className="user-box">
-            <input type="text" name="" required="" onChange={(e) => setEmail(e.target.value)}/>
+            <input type="text" name="" required="Please enter your email" onChange={(e) => setEmail(e.target.value)}/>
             <label>Email</label>
         </div>
         <div className="user-box">
-            <input type="password" name="" required="" onChange={(e) => setPassword(e.target.value)}/>
+            <input type="password" name="" required="Please enter your password" onChange={(e) => setPassword(e.target.value)}/>
             <label>Password</label>
         </div>
         <a href="#">

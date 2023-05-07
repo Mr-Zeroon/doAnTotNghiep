@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Formik } from 'formik';
 import * as yup from "yup";
 import { Box, TextField,Button,Select,MenuItem,InputLabel,FormControl } from '@mui/material';
@@ -6,42 +6,68 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import { v1 as uuidv1 } from 'uuid';
-import { collection, addDoc } from "firebase/firestore";
+import { collection,  getDocs, setDoc, doc } from "firebase/firestore";
 import {db} from '../../firebase';
+import { toast } from 'react-toastify';
+import MyMapComponent from '../../components/Map/MyMapComponent';
 const initialValues = {
   id:uuidv1(),
   fullName:"",
   phone:"",
   passWord:"",
   email:"",
-  typeUser:"CUSTOMER",
+  typeUser:"ADMIN",
   isDeleted:false
 }
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 const userSchema = yup.object().shape({
   id:yup.string().required("required"),
-  fullName:yup.string().required("Did not enter the fullName"),
-  phone: yup.string().matches(phoneRegExp, 'Phone Number is not valid').required("Did not enter the phoneNumber"),
-  passWord:yup.string().required("Did not enter the password"),
-  email:yup.string().email("invalid Email").required("Did not enter the email"),
-  typeUser:yup.string().required("Did not enter the typeUser"),
+  fullName:yup.string().required("Did not enter the Full Name"),
+  phone: yup.string().matches(phoneRegExp, 'Phone Number is not valid').required("Did not enter the Phone Number"),
+  passWord:yup.string().required("Did not enter the Password"),
+  email:yup.string().email("invalid Email").required("Did not enter the Email"),
+  typeUser:yup.string().required("Did not enter the Type User"),
 })
 
 const UserAdd = () => {
   const navigate = useNavigate()
   const isNorMobile = useMediaQuery("(min-width:600px)")
-  
+  const [user,setUser] = useState([])
+  const fetchPost = async () => {  
+    await getDocs(collection(db, "/users"))
+        .then((querySnapshot)=>{               
+            const newData = querySnapshot.docs
+                .map((doc) => ({...doc.data(), id:doc.id }));
+            setUser(newData);
+        }) 
+      }
+  useEffect(()=>{
+    fetchPost();
+  }, [])
+
   const handleFormSubmit = async (value)=>{
-    await addDoc(collection(db, "/users"), {
-      id:value.id,
-      fullName:value.fullName,
-      phone:value.phone,
-      passWord:value.passWord,
-      email:value.email,
-      typeUser:value.typeUser,
-      isDeleted:false 
-    })
-    navigate("/user") 
+    if(user.find(u=>u.email===value.email ))
+    {
+      toast.error("Email already exists")
+    }
+    else{
+      const newCityRef = doc(collection(db, "users"));
+      var bcrypt = require('bcryptjs');
+       bcrypt.hash(value.passWord, 10, async function  (err, hash)  {
+        await setDoc(newCityRef,{
+          id:newCityRef.id,
+          fullName:value.fullName,
+          phone:value.phone,
+          passWord:hash,
+          email:value.email,
+          typeUser:value.typeUser,
+          isDeleted:false 
+        });
+        toast.success("Create User Success");
+        navigate("/user") 
+      });
+    
+    }
   }
   
   const handleBack =()=>{
@@ -102,7 +128,7 @@ const UserAdd = () => {
                 fullWidth
                 variant='filled'
                 type='password'
-                label="passWord"
+                label="Password"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.passWord}
@@ -137,10 +163,20 @@ const UserAdd = () => {
                 >
                     <MenuItem value="ADMIN">ADMIN</MenuItem>
                     <MenuItem value="SHIPPER">SHIPPER</MenuItem>
-                    <MenuItem value="CUSTOMER">CUSTOMER</MenuItem>
                     <MenuItem value="STORE">STORE</MenuItem>
                 </Select>
               </FormControl>
+              {/* <MyMapComponent
+                onMapClick={this.onMapClick}
+
+                googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyB1KM0R3xVa8P0_VvMQah-F16OFrIYORs8"
+                loadingElement={<div style={{ height: `100%` }} />}
+                containerElement={<div style={{ height: `95vh` }} />}
+                mapElement={<div style={{ height: `100%` }} />}
+                lat={this.state.lat}
+                lng={this.state.lng}
+               
+              /> */}
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color='secondary' variant='contained'>ADD</Button>
