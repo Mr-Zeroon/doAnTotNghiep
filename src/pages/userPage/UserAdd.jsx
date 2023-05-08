@@ -9,7 +9,8 @@ import { v1 as uuidv1 } from 'uuid';
 import { collection,  getDocs, setDoc, doc } from "firebase/firestore";
 import {db} from '../../firebase';
 import { toast } from 'react-toastify';
-import MyMapComponent from '../../components/Map/MyMapComponent';
+
+
 const initialValues = {
   id:uuidv1(),
   fullName:"",
@@ -166,17 +167,7 @@ const UserAdd = () => {
                     <MenuItem value="STORE">STORE</MenuItem>
                 </Select>
               </FormControl>
-              {/* <MyMapComponent
-                onMapClick={this.onMapClick}
-
-                googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyB1KM0R3xVa8P0_VvMQah-F16OFrIYORs8"
-                loadingElement={<div style={{ height: `100%` }} />}
-                containerElement={<div style={{ height: `95vh` }} />}
-                mapElement={<div style={{ height: `100%` }} />}
-                lat={this.state.lat}
-                lng={this.state.lng}
-               
-              /> */}
+              
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color='secondary' variant='contained'>ADD</Button>

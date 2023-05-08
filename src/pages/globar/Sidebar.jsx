@@ -146,13 +146,6 @@ const Sidebars = () => {
                 setSelected={setSelected}
               />
               <Item 
-                title="Order Complete"
-                to="orderComplete"
-                icon={<DinnerDiningIcon/>}
-                selected={selected}
-                setSelected={setSelected}
-              />
-              <Item 
                 title="Voucher"
                 to="voucher"
                 icon={<LoyaltyOutlinedIcon/>}

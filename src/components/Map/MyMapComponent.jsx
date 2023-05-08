@@ -1,23 +1,21 @@
-// const MyMapComponent = withScriptjs(
-//     withGoogleMap(props => (
-//       <GoogleMap
-//         defaultZoom={8}
-//         defaultCenter={{ lat: props.lat, lng: props.lng }}
-//         onClick={e => console.log(e)}
-//       >
-//         {props.isMarkerShown && (
-//           <Marker position={{ lat: props.lat, lng: props.lng }} />
-//         )}
-//         <MarkerClusterer averageCenter enableRetinaIcons gridSize={60}>
-//           {props.markers.map(marker => (
-//             <CustomMarker
-//               key={marker.id}
-//               marker={marker}
-  
-//             />
-//           ))}
-//         </MarkerClusterer>
-//       </GoogleMap>
-//     ))
-//   );
-//   export default MyMapComponent;
+import React from 'react'
+import Geocode from "react-geocode";
+
+
+function MyComponent() {
+    Geocode.setApiKey("AIzaSyB1KM0R3xVa8P0_VvMQah-F16OFrIYORs8");
+    Geocode.fromAddress("ADDRESS").then(
+      (response) => {
+        const { lat, lng } = response.results[0].geometry.location;
+        console.log("Latitude:", lat);
+        console.log("Longitude:", lng);
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+
+  return 
+}
+
+export default React.memo(MyComponent)

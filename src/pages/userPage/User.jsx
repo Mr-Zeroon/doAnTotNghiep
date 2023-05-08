@@ -11,6 +11,7 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { collection, getDocs, doc, deleteDoc, where, query, updateDoc } from "firebase/firestore";
 import {db} from '../../firebase'
 import { toast } from 'react-toastify';
+
 const User = () => {
   const navigate = useNavigate();
   const [user,setUser] = useState([])

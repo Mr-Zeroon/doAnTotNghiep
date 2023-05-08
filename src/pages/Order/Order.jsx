@@ -11,6 +11,7 @@ import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlin
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { collection, getDocs } from "firebase/firestore";
 import {db} from '../../firebase'
+import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import { toast } from 'react-toastify';
 
 const Order = () => {
@@ -81,6 +82,7 @@ const Order = () => {
             {statusOrder==="DELIVERING" && <LocalShippingOutlinedIcon/>}
             {statusOrder==="DONE" && <EventAvailableOutlinedIcon/>}
             {statusOrder==="CANCEL" && <CancelOutlinedIcon/>}
+            {statusOrder==="CONFIRM" && <ThumbUpAltIcon/>}
             
             <Typography color={colors.grey[100]} sx={{ml:"0px"}}>
               {statusOrder}
@@ -89,25 +91,7 @@ const Order = () => {
         )
       }
     },
-    // {field: 'action',
-    //   headerName: 'Action',
-    //   width: 180,
-    //   sortable: false,
-    //   disableClickEventBubbling: true,
-      
-    //   renderCell: (params) => {
-    //     const currentRow = params.row;
-    //       const handleView=()=>{
-    //        return  toast.success(JSON.stringify(currentRow, null, 4))
-    //       }
-         
-    //       return (
-    //         <Box direction="row" spacing={2} display="flex" gap="5px">
-    //           <Button variant="contained" color="warning" size="small" onClick={handleView}>VIEW</Button>
-    //         </Box>
-    //       );
-    //   }
-    // },
+    
 
 ]
 return (

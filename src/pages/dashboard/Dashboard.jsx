@@ -90,7 +90,6 @@ const Dashboard = () => {
             title={handleCountUser.customer}
             subtitle="Customer"
             progress="0.75"
-            increase="+14%"
             icon={
               <PersonIcon
                 sx={{ color:colors.greenAccent[600],fontSize:"26px"}}
@@ -110,7 +109,6 @@ const Dashboard = () => {
             title={handleCountUser.shipper}
             subtitle="Shipper"
             progress="0.5"
-            increase="+14%"
             icon={
               <LocalShippingIcon
                 sx={{ color:colors.greenAccent[600],fontSize:"26px"}}
@@ -130,7 +128,6 @@ const Dashboard = () => {
             title={handleCountUser.store}
             subtitle="Store"
             progress="0.25"
-            increase="+14%"
             icon={
               <StoreMallDirectoryIcon
                 sx={{ color:colors.greenAccent[600],fontSize:"26px"}}
@@ -150,7 +147,6 @@ const Dashboard = () => {
             title={handleCountUser.admin}
             subtitle="Admin"
             progress="1"
-            increase="+14%"
             icon={
               <AdminPanelSettingsOutlinedIcon
                 sx={{ color:colors.greenAccent[600],fontSize:"26px"}}
