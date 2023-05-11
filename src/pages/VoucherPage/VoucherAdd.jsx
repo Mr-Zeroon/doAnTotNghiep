@@ -218,7 +218,7 @@ const VoucherAdd = () => {
                 sx={{gridColumn:"span 4"}}/>
                {
                    
-                  <span><img src={images} alt=""style={{height:"120px",width:"200px",marginTop:"10px"}} /></span>
+                  <span><img src={images} alt="" style={{height:"120px",width:"200px",marginTop:"10px"}} /></span>
                 
                }
             </Box>

@@ -4,60 +4,41 @@ import * as yup from "yup";
 import { Box, TextField,Button,Select,MenuItem,InputLabel,FormControl } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/Header/Header';
 import { v1 as uuidv1 } from 'uuid';
 import { collection,  getDocs, setDoc, doc } from "firebase/firestore";
-import {db} from '../../firebase';
 import { toast } from 'react-toastify';
-import { GoogleMap, LoadScript } from '@react-google-maps/api'
-import { useRef } from 'react';
+import { db } from '../../../firebase';
+import Header from '../../../components/Header/Header';
+import Places from '../../../components/Map/MyMapComponent';
+
 
 const initialValues = {
   id:uuidv1(),
   fullName:"",
-  phone:"",
   passWord:"",
   email:"",
-  typeUser:"ADMIN",
-  isDeleted:false
+  vehicleNumber:"",
+  typeUser:"STORE",
+  isDeleted:false,
+  address:""
 }
-const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
+
 const userSchema = yup.object().shape({
   id:yup.string().required("required"),
   fullName:yup.string().required("Did not enter the Full Name"),
-  phone: yup.string().matches(phoneRegExp, 'Phone Number is not valid').required("Did not enter the Phone Number"),
   passWord:yup.string().required("Did not enter the Password"),
   email:yup.string().email("invalid Email").required("Did not enter the Email"),
-  typeUser:yup.string().required("Did not enter the Type User"),
+  address:yup.string().required("Did not enter the Address"),
 })
 
-const UserAdd = () => {
-
-  const mapRef = useRef(null);
-  console.log(mapRef,"asd");
-  const [position, setPosition] = useState();
-  const [lats,setLats]=useState();
-  console.log(lats,"asdh");
-  const [lngs,setLngs]=useState();
-  console.log(lngs,"ajsd");
-  const toado = `${lats};${lngs}`
-  console.log(toado,"toado");
-  function handleLoad(map) {
-    mapRef.current = map;
-  }
-
-  function handleCenter() {
-    if (!mapRef.current) return;
-
-    const newPos = mapRef.current.getCenter().toJSON();
-    setPosition(newPos);
-  }
-
-
-
+const AddStore = () => {
   const navigate = useNavigate()
   const isNorMobile = useMediaQuery("(min-width:600px)")
   const [user,setUser] = useState([])
+  const [latLng,setLapLng] = useState("")
+  console.log(latLng,"latLng");
+  var today = new Date();
+  var date = today.getDate()+'-'+(today.getMonth()+1)+'-'+today.getFullYear();
   const fetchPost = async () => {  
     await getDocs(collection(db, "/users"))
         .then((querySnapshot)=>{               
@@ -69,6 +50,10 @@ const UserAdd = () => {
   useEffect(()=>{
     fetchPost();
   }, [])
+
+  const handleLatLong = (value) =>{
+    setLapLng(value)
+  }
 
   const handleFormSubmit = async (value)=>{
     if(user.find(u=>u.email===value.email ))
@@ -82,14 +67,20 @@ const UserAdd = () => {
         await setDoc(newCityRef,{
           id:newCityRef.id,
           fullName:value.fullName,
-          phone:value.phone,
+          phone:"",
           passWord:hash,
+          avatar:"",
           email:value.email,
+          vehicleNumber:"",
           typeUser:value.typeUser,
-          latlong:toado,
-          isDeleted:false 
+          isDeleted:false,
+          createdAccount:date,
+          address:value.address,
+          openHour:"",
+          closeHour:"",
+          latLong:latLng
         });
-        toast.success("Create User Success");
+        toast.success("Create Store Success");
         navigate("/user") 
       });
     
@@ -100,14 +91,7 @@ const UserAdd = () => {
     navigate("/user") 
   }
 
-  const defaultProps = {
-    center: {
-      lat: 10.99835602,
-      lng: 77.01502627
-    },
-    zoom: 11
-  };
-
+ 
   return (
     <Box m="20px">
       <Header  title="User" subtitle="User Management"/>
@@ -135,39 +119,13 @@ const UserAdd = () => {
                 fullWidth
                 variant='filled'
                 type='text'
-                label="Full Name"
+                label="Name"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.fullName}
                 name="fullName"
                 error={!!touched.fullName && !!errors.fullName}
                 helperText={touched.fullName && errors.fullName}
-                sx={{gridColumn:"span 4"}}
-              />
-              <TextField 
-                fullWidth
-                variant='filled'
-                type='text'
-                label="Phone Number"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.phone}
-                name="phone"
-                error={!!touched.phone && !!errors.phone}
-                helperText={touched.phone && errors.phone}
-                sx={{gridColumn:"span 4"}}
-              />
-              <TextField 
-                fullWidth
-                variant='filled'
-                type='password'
-                label="Password"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.passWord}
-                name="passWord"
-                error={!!touched.passWord && !!errors.passWord}
-                helperText={touched.passWord && errors.passWord}
                 sx={{gridColumn:"span 4"}}
               />
               <TextField 
@@ -183,51 +141,32 @@ const UserAdd = () => {
                 helperText={touched.email && errors.email}
                 sx={{gridColumn:"span 4"}}
               />
-                
-             <FormControl fullWidth sx={{gridColumn:"span 4"}}>
-                <InputLabel >Type User</InputLabel>
-                <Select
-                    variant='filled'
-                    label= "Type User"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.typeUser}
-                    name="typeUser"
-                >
-                    <MenuItem value="ADMIN">ADMIN</MenuItem>
-                    <MenuItem value="SHIPPER">SHIPPER</MenuItem>
-                    <MenuItem value="STORE">STORE</MenuItem>
-                </Select>
-              </FormControl>
-              
-              <Box  sx={{gridColumn:"span 4"}}> 
-                <LoadScript
-                  id="script-loader"
-                  googleMapsApiKey="AIzaSyCpj7Wz9DyR1zeANOG59bYNoXQ_6wDrPkA"
-                >
-                  <GoogleMap
-                      zoom={12}
-                      onLoad={handleLoad}
-                      onDragEnd={handleCenter}
-                      onClick={(e) => {
-                        setLats(e.latLng.lat())
-                        setLngs(e.latLng.lng())
-                      }}
-                      center={{
-                        lat: 	16.047079, 
-                        lng: 108.206230
-                    }}
-                      id="map"
-                      mapContainerStyle={{
-                        height: '300px',
-                        width: '100%'
-                      }}
-                    >
-                  </GoogleMap>
-                </LoadScript>
-              </Box>
+              <TextField 
+                fullWidth
+                variant='filled'
+                type='password'
+                label="Password"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.passWord}
+                name="passWord"
+                error={!!touched.passWord && !!errors.passWord}
+                helperText={touched.passWord && errors.passWord}
+                sx={{gridColumn:"span 4"}}
+              /> 
+              <TextField 
+                fullWidth
+                variant='filled'
+                type='text'
+                label="Address"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.address}
+                name="address"
+                sx={{gridColumn:"span 4"}}
+              /> 
 
-
+                <Places handleLatLong={handleLatLong} sx={{gridColumn:"span 4"}}/>
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color='secondary' variant='contained'>ADD</Button>
@@ -239,4 +178,4 @@ const UserAdd = () => {
   )
 }
 
-export default UserAdd
+export default AddStore

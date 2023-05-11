@@ -12,7 +12,7 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { collection, getDocs } from "firebase/firestore";
 import {db} from '../../firebase'
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
-import { toast } from 'react-toastify';
+
 
 const Order = () => {
   const [order,setOrder] = useState([])

@@ -1,21 +1,26 @@
-import React from 'react'
-import Geocode from "react-geocode";
+import React, { useState } from 'react'
+import {  useLoadScript } from '@react-google-maps/api';
+import "@reach/combobox/styles.css";
+import Map from './Map';
 
+ const Places = ({handleLatLong}) => {
+  const [places,setPlaces] = useState("")
+  handleLatLong(places)
+  const handlePlaces = (value) =>{
+    setPlaces(value)
+  }
+  const [ libraries ] = useState(['places']);
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: "AIzaSyCpj7Wz9DyR1zeANOG59bYNoXQ_6wDrPkA",
+    libraries
+  })
 
-function MyComponent() {
-    Geocode.setApiKey("AIzaSyB1KM0R3xVa8P0_VvMQah-F16OFrIYORs8");
-    Geocode.fromAddress("ADDRESS").then(
-      (response) => {
-        const { lat, lng } = response.results[0].geometry.location;
-        console.log("Latitude:", lat);
-        console.log("Longitude:", lng);
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
-
-  return 
+  if(!isLoaded) return <div>Loading....</div>
+  return <Map handlePlaces={handlePlaces} />
 }
 
-export default React.memo(MyComponent)
+
+
+
+
+export default Places;

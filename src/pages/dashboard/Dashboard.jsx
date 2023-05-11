@@ -8,11 +8,12 @@ import PersonIcon from '@mui/icons-material/Person';
 import StoreMallDirectoryIcon from '@mui/icons-material/StoreMallDirectory';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import VNChart from '../../components/Chart/VNChart';
-import BarChart from '../../components/Chart/BarChart';
 import StartBox from '../../components/StartBox.jsx/StartBox';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useMemo } from 'react';
+import Chart from '../../components/Chart/ChartHome/Chart';
+
 
 
 const Dashboard = () => {
@@ -168,25 +169,10 @@ const Dashboard = () => {
               justifyContent="space-between"
               alignItems="center"
             >
-              <Box>
-                <Typography variant='h5' fontWeight="600" color={colors.grey[100]}>
-                  Revenue Generated
-                </Typography>
-                <Typography variant='h3' fontWeight="600" color={colors.greenAccent[500]}>
-                  $59,432,121
-                </Typography>
-              </Box>
-              <Box>
-                <IconButton>
-                  <DownloadOutlinedIcon
-                    sx={{fontSize:"26px",color:colors.greenAccent[500]}}
-                  />
-                </IconButton>
-              </Box>
             </Box>
 
             <Box height="250px" ml="-20px">
-              {/* <LineChart isDashboard={true}/> */}
+              <Chart/>
             </Box>
           </Box>
           {/* VNChart */}

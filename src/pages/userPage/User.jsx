@@ -17,9 +17,17 @@ const User = () => {
   const [user,setUser] = useState([])
   const theme = useTheme();
   const colors = tokens(theme.palette.mode)
-  const handleAdd = (e)=>{
+  const handleAddAdmin = (e)=>{
     e.preventDefault();
-    navigate("/user/userAdd")
+    navigate("/user/addAdmin")
+  }
+  const handleAddShipper = (e)=>{
+    e.preventDefault();
+    navigate("/user/addShipper")
+  }
+  const handleAddStore = (e)=>{
+    e.preventDefault();
+    navigate("/user/addStore")
   }
   const fetchPost = async () => {  
     await getDocs(collection(db, "/users"))
@@ -81,7 +89,7 @@ const User = () => {
           const handleDelete = async (e) =>{
             const currentRow = params.row;                       
               await deleteDoc(doc(db, "/users", currentRow.id));
-              toast.error("Delete User success");
+              toast.success("Delete User success");
               fetchPost();
           }
 
@@ -89,13 +97,7 @@ const User = () => {
             if(currentRow.typeUser!=="ADMIN" && currentRow.isDeleted === false){             
                query(collection(db, "/users"), where("id", "==", currentRow.id));
                 const user = doc(db, "/users", currentRow.id);
-                await updateDoc(user, {
-                  id:currentRow.id,
-                  fullName:currentRow.fullName,
-                  phone:currentRow.phone,
-                  passWord:currentRow.passWord,
-                  email:currentRow.email,
-                  typeUser:currentRow.typeUser,
+                await updateDoc(user,{
                   isDeleted:true 
                 });
                 toast.success("Lock User success");
@@ -104,12 +106,6 @@ const User = () => {
                query(collection(db, "/users"), where("id", "==", currentRow.id));
                 const user = doc(db, "/users", currentRow.id);
                 await updateDoc(user, {
-                  id:currentRow.id,
-                  fullName:currentRow.fullName,
-                  phone:currentRow.phone,
-                  passWord:currentRow.passWord,
-                  email:currentRow.email,
-                  typeUser:currentRow.typeUser,
                   isDeleted:false 
                 });
                 toast.success("Unlock User success");
@@ -138,8 +134,10 @@ const User = () => {
   return (
     <Box m="20px" >
       <Header  title="User" subtitle="User Management"/>
-      <Box display='flex' justifyContent='flex-end' marginTop="-36px">
-        <Button type="submit" color='secondary' variant='contained' onClick={handleAdd}>ADD</Button>
+      <Box display='flex' justifyContent='flex-end' marginTop="-36px" gap="10px" >
+        <Button type="submit" color='secondary' variant='contained' onClick={handleAddShipper}>ADD SHIPPER</Button>
+        <Button type="submit" color='secondary' variant='contained' onClick={handleAddStore}>ADD STORE</Button>
+        <Button type="submit" color='secondary' variant='contained' onClick={handleAddAdmin}>ADD ADMIN</Button>
       </Box>
       <Box m="40px 0 0 0" marginTop="5px" height="75vh" sx={{
         "& .MuiDataGrid-root":{

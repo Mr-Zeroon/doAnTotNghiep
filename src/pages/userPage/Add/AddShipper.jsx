@@ -4,21 +4,24 @@ import * as yup from "yup";
 import { Box, TextField,Button,Select,MenuItem,InputLabel,FormControl } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useNavigate } from 'react-router-dom';
-import Header from '../../components/Header/Header';
 import { v1 as uuidv1 } from 'uuid';
 import { collection,  getDocs, setDoc, doc } from "firebase/firestore";
-import {db} from '../../firebase';
 import { toast } from 'react-toastify';
-import { GoogleMap, LoadScript } from '@react-google-maps/api'
-import { useRef } from 'react';
+import { db, storage } from '../../../firebase';
+import Header from '../../../components/Header/Header';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+
+
 
 const initialValues = {
   id:uuidv1(),
   fullName:"",
   phone:"",
   passWord:"",
-  email:"",
-  typeUser:"ADMIN",
+  dateOfBirth:"",
+  vehicleNumber:"",
+  typeUser:"SHIPPER",
+  gender:"Nam",
   isDeleted:false
 }
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
@@ -27,37 +30,33 @@ const userSchema = yup.object().shape({
   fullName:yup.string().required("Did not enter the Full Name"),
   phone: yup.string().matches(phoneRegExp, 'Phone Number is not valid').required("Did not enter the Phone Number"),
   passWord:yup.string().required("Did not enter the Password"),
-  email:yup.string().email("invalid Email").required("Did not enter the Email"),
-  typeUser:yup.string().required("Did not enter the Type User"),
+  vehicleNumber:yup.string().required("Did not enter the License plates"),
+  dateOfBirth:yup.string().required("Did not enter the Birth Day"),
+  gender:yup.string().required("Did not enter the Gender"),
 })
 
-const UserAdd = () => {
-
-  const mapRef = useRef(null);
-  console.log(mapRef,"asd");
-  const [position, setPosition] = useState();
-  const [lats,setLats]=useState();
-  console.log(lats,"asdh");
-  const [lngs,setLngs]=useState();
-  console.log(lngs,"ajsd");
-  const toado = `${lats};${lngs}`
-  console.log(toado,"toado");
-  function handleLoad(map) {
-    mapRef.current = map;
-  }
-
-  function handleCenter() {
-    if (!mapRef.current) return;
-
-    const newPos = mapRef.current.getCenter().toJSON();
-    setPosition(newPos);
-  }
-
-
-
+const AddShipper = () => {
+  const [images, setImages] = useState("")
   const navigate = useNavigate()
   const isNorMobile = useMediaQuery("(min-width:600px)")
   const [user,setUser] = useState([])
+  var today = new Date();
+  var date = today.getDate()+'-'+(today.getMonth()+1)+'-'+today.getFullYear();
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+        const id = uuidv1()
+        const imageRef = ref(storage, "/imageFood/" + id);
+        uploadBytes(imageRef, e.target.files[0])
+            .then(() => {
+                getDownloadURL(imageRef).then((url) => {
+                    setImages(prev => [...prev, url])
+
+                }).catch(error => {
+                    console.log(error.message, "err");
+                });
+            })
+    }
+}
   const fetchPost = async () => {  
     await getDocs(collection(db, "/users"))
         .then((querySnapshot)=>{               
@@ -71,11 +70,6 @@ const UserAdd = () => {
   }, [])
 
   const handleFormSubmit = async (value)=>{
-    if(user.find(u=>u.email===value.email ))
-    {
-      toast.error("Email already exists")
-    }
-    else{
       const newCityRef = doc(collection(db, "users"));
       var bcrypt = require('bcryptjs');
        bcrypt.hash(value.passWord, 10, async function  (err, hash)  {
@@ -84,33 +78,31 @@ const UserAdd = () => {
           fullName:value.fullName,
           phone:value.phone,
           passWord:hash,
-          email:value.email,
+          avatar:"",
+          gender:value.gender,
+          dateOfBirth:value.dateOfBirth,
+          vehicleNumber:value.vehicleNumber,
           typeUser:value.typeUser,
-          latlong:toado,
-          isDeleted:false 
+          listIdentifycation:images,
+          email:"",
+          isDeleted:false,
+          createdAccount:date
         });
-        toast.success("Create User Success");
+        toast.success("Create Shipper Success");
         navigate("/user") 
       });
     
-    }
+    
   }
   
   const handleBack =()=>{
     navigate("/user") 
   }
 
-  const defaultProps = {
-    center: {
-      lat: 10.99835602,
-      lng: 77.01502627
-    },
-    zoom: 11
-  };
-
+ 
   return (
     <Box m="20px">
-      <Header  title="User" subtitle="User Management"/>
+      <Header  title="User" subtitle="Shipper Add"/>
       <Box display='flex' justifyContent='flex-end' marginTop="-36px">
         <Button type="submit" color='secondary' variant='contained' onClick={handleBack}>Back</Button>
       </Box>
@@ -169,65 +161,63 @@ const UserAdd = () => {
                 error={!!touched.passWord && !!errors.passWord}
                 helperText={touched.passWord && errors.passWord}
                 sx={{gridColumn:"span 4"}}
-              />
+              /> 
+
+              <FormControl fullWidth sx={{gridColumn:"span 4"}}>
+                <InputLabel >Gender</InputLabel>
+                <Select
+                    variant='filled'
+                    label= "Gender"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.gender}
+                    name="gender"
+                >
+                    <MenuItem value="Nữ">Nữ</MenuItem>
+                    <MenuItem value="Nam">Nam</MenuItem>
+                    <MenuItem value="Khác">Khác</MenuItem>
+                </Select>
+              </FormControl>
+
+              <TextField 
+                fullWidth
+                variant='filled'
+                type='date'
+                label="Birth Day"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.dateOfBirth}
+                name="dateOfBirth"
+                error={!!touched.dateOfBirth && !!errors.dateOfBirth}
+                helperText={touched.dateOfBirth && errors.dateOfBirth}
+                sx={{gridColumn:"span 4"}}
+              /> 
               <TextField 
                 fullWidth
                 variant='filled'
                 type='text'
-                label="Email"
+                label="License plates"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.email}
-                name="email"
-                error={!!touched.email && !!errors.email}
-                helperText={touched.email && errors.email}
+                value={values.vehicleNumber}
+                name="vehicleNumber"
+                error={!!touched.vehicleNumber && !!errors.vehicleNumber}
+                helperText={touched.vehicleNumber && errors.vehicleNumber}
                 sx={{gridColumn:"span 4"}}
-              />
-                
-             <FormControl fullWidth sx={{gridColumn:"span 4"}}>
-                <InputLabel >Type User</InputLabel>
-                <Select
-                    variant='filled'
-                    label= "Type User"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.typeUser}
-                    name="typeUser"
-                >
-                    <MenuItem value="ADMIN">ADMIN</MenuItem>
-                    <MenuItem value="SHIPPER">SHIPPER</MenuItem>
-                    <MenuItem value="STORE">STORE</MenuItem>
-                </Select>
-              </FormControl>
-              
-              <Box  sx={{gridColumn:"span 4"}}> 
-                <LoadScript
-                  id="script-loader"
-                  googleMapsApiKey="AIzaSyCpj7Wz9DyR1zeANOG59bYNoXQ_6wDrPkA"
-                >
-                  <GoogleMap
-                      zoom={12}
-                      onLoad={handleLoad}
-                      onDragEnd={handleCenter}
-                      onClick={(e) => {
-                        setLats(e.latLng.lat())
-                        setLngs(e.latLng.lng())
-                      }}
-                      center={{
-                        lat: 	16.047079, 
-                        lng: 108.206230
-                    }}
-                      id="map"
-                      mapContainerStyle={{
-                        height: '300px',
-                        width: '100%'
-                      }}
-                    >
-                  </GoogleMap>
-                </LoadScript>
-              </Box>
-
-
+              /> 
+              <TextField 
+                required
+                fullWidth
+                variant='filled'
+                type="file"
+                onChange={(e) => handleImageChange(e)}
+                sx={{gridColumn:"span 4"}}/>
+                {
+                   images &&
+                   images.map((img, index) => (
+                   <span key={index} className=' w-36'> <img src={img} alt="" style={{height:"120px",width:"200px",marginTop:"10px"}}  /></span>
+                    ))
+                }
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color='secondary' variant='contained'>ADD</Button>
@@ -239,4 +229,4 @@ const UserAdd = () => {
   )
 }
 
-export default UserAdd
+export default AddShipper
