@@ -30,7 +30,7 @@ const userSchema = yup.object().shape({
   fullName:yup.string().required("Did not enter the Full Name"),
   phone: yup.string().matches(phoneRegExp, 'Phone Number is not valid').required("Did not enter the Phone Number"),
   passWord:yup.string().required("Did not enter the Password"),
-  vehicleNumber:yup.string().required("Did not enter the License plates"),
+  vehicleNumber:yup.string().required("Did not enter the License Plates"),
   dateOfBirth:yup.string().required("Did not enter the Birth Day"),
   gender:yup.string().required("Did not enter the Gender"),
 })
@@ -196,7 +196,7 @@ const AddShipper = () => {
                 fullWidth
                 variant='filled'
                 type='text'
-                label="License plates"
+                label="License Plates"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.vehicleNumber}

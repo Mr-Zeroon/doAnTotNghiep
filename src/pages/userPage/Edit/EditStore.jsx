@@ -4,12 +4,13 @@ import * as yup from "yup";
 import { Box, TextField,Button,Select,MenuItem,InputLabel,FormControl } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useNavigate, useParams } from 'react-router-dom';
-import Header from '../../components/Header/Header';
 import { collection, doc, updateDoc, query, where, getDocs } from "firebase/firestore";
-import {db} from '../../firebase';
 import { toast } from 'react-toastify';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import { db } from '../../../firebase';
+import Header from '../../../components/Header/Header';
+import Places from '../../../components/Map/MyMapComponent';
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 const userSchema = yup.object().shape({
@@ -18,21 +19,23 @@ const userSchema = yup.object().shape({
   phone: yup.string().matches(phoneRegExp, 'Phone Number is not valid').required("Did not enter the phoneNumber"),
   passWord:yup.string().required("Did not enter the password"),
   email:yup.string().email("invalid Email").required("Did not enter the email"),
-  typeUser:yup.string().required("Did not enter the typeUser"),
 })
 
-const UserEdit = () => {
+const EditStore = () => {
   const navigate = useNavigate()
   const {editID} = useParams()
   const isNorMobile = useMediaQuery("(min-width:600px)")
+  const [latLng,setLapLng] = useState("")
+  
   const initialValues = {
     id:editID,
     fullName:"",
     phone:"",
     passWord:"",
     email:"",
-    typeUser:"ADMIN",
+    typeUser:"Store",
   }
+  
   const [user,setUser] = useState([])
   const fetchPost = async () => {  
     await getDocs(collection(db, "/users"))
@@ -46,7 +49,11 @@ const UserEdit = () => {
     fetchPost();
   }, [])
 
-  const handleFormSubmit = async (value) => {  
+  const handleLatLong = (value) =>{
+    setLapLng(value)
+  }
+
+  const handleFormSubmit = async (value) => {
     if(user.find(u=>u.email===value.email && u.id!==value.id))
     {
       toast.error("Email already exists")
@@ -54,16 +61,17 @@ const UserEdit = () => {
     else{
       var bcrypt = require('bcryptjs');
       bcrypt.hash(value.passWord, 10, async function  (err, hash)  {
-            query(collection(db, "/users"), where("id", "==", editID));
-              const user = doc(db, "/users", editID);
-              await updateDoc(user, {
+            query(collection(db, "users"), where("id", "==", editID));
+              const store = doc(db, "users", editID);
+              await updateDoc(store, {
                 fullName:value.fullName,
-                phone:value.phone,
                 passWord:hash,
                 email:value.email,
-                typeUser:value.typeUser, 
+                address:value.address,
+                // latLong:latLng,
+                
               });  
-          toast.success("Update Admins Success");
+          toast.success("Update Store Success");
           navigate("/user") 
         });
       }
@@ -78,7 +86,7 @@ const UserEdit = () => {
   
   return (
     <Box m="20px">
-      <Header  title="User" subtitle="Update Admin"/>
+      <Header  title="User" subtitle="Update Store"/>
       <Box display='flex' justifyContent='flex-end' marginTop="-36px">
         <Button type="submit" color='secondary' variant='contained' onClick={handleBack}>Back</Button>
       </Box>
@@ -103,39 +111,13 @@ const UserEdit = () => {
                 fullWidth
                 variant='filled'
                 type='text'
-                label="Full Name"
+                label="Name"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.fullName}
                 name="fullName"
                 error={!!touched.fullName && !!errors.fullName}
                 helperText={touched.fullName && errors.fullName}
-                sx={{gridColumn:"span 4"}}
-              />
-              <TextField 
-                fullWidth
-                variant='filled'
-                type='text'
-                label="Phone Number"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.phone}
-                name="phone"
-                error={!!touched.phone && !!errors.phone}
-                helperText={touched.phone && errors.phone}
-                sx={{gridColumn:"span 4"}}
-              />
-              <TextField 
-                fullWidth
-                variant='filled'
-                type='password'
-                label="Password"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.passWord}
-                name="passWord"
-                error={!!touched.passWord && !!errors.passWord}
-                helperText={touched.passWord && errors.passWord}
                 sx={{gridColumn:"span 4"}}
               />
               <TextField 
@@ -151,24 +133,35 @@ const UserEdit = () => {
                 helperText={touched.email && errors.email}
                 sx={{gridColumn:"span 4"}}
               />
-                
-             <FormControl fullWidth sx={{gridColumn:"span 4"}}>
-                <InputLabel >Type User</InputLabel>
-                <Select
-                    
-                    variant='filled'
-                    label= "Type User"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.typeUser}
-                    name="typeUser"
-                >
-                    <MenuItem value="ADMIN">ADMIN</MenuItem>
-                </Select>
-              </FormControl>
+              <TextField 
+                fullWidth
+                variant='filled'
+                type='password'
+                label="Password"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.passWord}
+                name="passWord"
+                error={!!touched.passWord && !!errors.passWord}
+                helperText={touched.passWord && errors.passWord}
+                sx={{gridColumn:"span 4"}}
+              /> 
+              <TextField 
+                fullWidth
+                variant='filled'
+                type='text'
+                label="Address"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.address}
+                name="address"
+                sx={{gridColumn:"span 4"}}
+              /> 
+
+                {/* <Places handleLatLong={handleLatLong} sx={{gridColumn:"span 4"}}/> */}
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color='secondary' variant='contained'>UPDATE</Button>
+              <Button type="submit" color='secondary' variant='contained'>Update</Button>
             </Box>
           </form>
         )}
@@ -177,4 +170,4 @@ const UserEdit = () => {
   )
 }
 
-export default UserEdit
+export default EditStore

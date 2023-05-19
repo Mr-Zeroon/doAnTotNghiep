@@ -84,7 +84,11 @@ const User = () => {
         
           const handleEdit = () => {
             const currentRow = params.row;           
-              navigate(`/user/${currentRow.id}`)
+              navigate(`/user/admin/${currentRow.id}`)
+          };
+          const handleEditStore = () => {
+            const currentRow = params.row;           
+              navigate(`/user/store/${currentRow.id}`)
           };
           const handleDelete = async (e) =>{
             const currentRow = params.row;                       
@@ -122,7 +126,7 @@ const User = () => {
                 <Button variant="contained" color="error" size="small" onClick={handleDelete}>Delete</Button>
               </Box>
              )
-             :(<Button variant="contained" color="warning" size="small" onClick={handleLock}>{currentRow.isDeleted===true?"UnLock":"Lock"}</Button>)
+              :(<Button variant="contained" color="warning" size="small" onClick={handleLock}>{currentRow.isDeleted===true?"UnLock":"Lock"}</Button>)
              }
             </Box>
           );

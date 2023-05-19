@@ -11,7 +11,7 @@ import Map from './Map';
   }
   const [ libraries ] = useState(['places']);
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "AIzaSyCpj7Wz9DyR1zeANOG59bYNoXQ_6wDrPkA",
+    googleMapsApiKey: "AIzaSyCS3zaYT8njnV19W6gDGohy26RM9cg1j-c",
     libraries
   })
 

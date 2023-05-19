@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Formik } from 'formik';
 import * as yup from "yup";
-import { Box, TextField,Button,Select,MenuItem,InputLabel,FormControl } from '@mui/material';
+import { Box, TextField,Button} from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useNavigate } from 'react-router-dom';
 import { v1 as uuidv1 } from 'uuid';
@@ -51,7 +51,7 @@ const AddStore = () => {
     fetchPost();
   }, [])
 
-  const handleLatLong = (value) =>{
+  const handleLatLong = (value) => {
     setLapLng(value)
   }
 
@@ -71,7 +71,6 @@ const AddStore = () => {
           passWord:hash,
           avatar:"",
           email:value.email,
-          vehicleNumber:"",
           typeUser:value.typeUser,
           isDeleted:false,
           createdAccount:date,
@@ -94,7 +93,7 @@ const AddStore = () => {
  
   return (
     <Box m="20px">
-      <Header  title="User" subtitle="User Management"/>
+      <Header  title="User" subtitle="Add Store"/>
       <Box display='flex' justifyContent='flex-end' marginTop="-36px">
         <Button type="submit" color='secondary' variant='contained' onClick={handleBack}>Back</Button>
       </Box>

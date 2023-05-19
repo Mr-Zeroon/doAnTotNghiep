@@ -28,6 +28,13 @@ const Chart = () => {
     handleReadData()
 },[])
 
+const price = (price) => {
+  if (price.statusOrder === 'DONE') {
+    return price.totalPrice 
+  } else {
+    return 0;
+  }
+}
 
 const computedDataTypeYear = useMemo(() => {
   return revenueData.reduce((prevObj, data)=>{
@@ -44,74 +51,74 @@ const computedDataTypeYear = useMemo(() => {
     if(Month === 1) {
       return {
         ...prevObj,
-        Thang1: (prevObj.Thang1 || 0) + data.totalPrice
+        Thang1: (prevObj.Thang1 || 0) + price(data)
       }
       
     }
     if(Month === 2) {
       return {
         ...prevObj,
-        Thang2: (prevObj.Thang2 || 0) + data.totalPrice
+        Thang2: (prevObj.Thang2 || 0) + price(data)
       }
     }
     if(Month === 3) {
       return {
         ...prevObj,
-        Thang3: (prevObj.Thang3 || 0) + data.totalPrice
+        Thang3: (prevObj.Thang3 || 0) + price(data)
       }
     }
     if(Month === 4) {
       return {
         ...prevObj,
-        Thang4: (prevObj.Thang4 || 0) + data.totalPrice
+        Thang4: (prevObj.Thang4 || 0) + price(data)
       }
     }
     if(Month === 5) {
       return {
         ...prevObj,
-        Thang5: (prevObj.Thang5 || 0) + data.totalPrice
+        Thang5: (prevObj.Thang5 || 0) + price(data)
       }
     }
     if(Month === 6) {
       return {
         ...prevObj,
-        Thang6: (prevObj.Thang6 || 0) + data.totalPrice
+        Thang6: (prevObj.Thang6 || 0) + price(data)
       }
     }
     if(Month === 7) {
       return {
         ...prevObj,
-        Thang7: (prevObj.Thang7 || 0) + data.totalPrice
+        Thang7: (prevObj.Thang7 || 0) + price(data)
       }
     }
     if(Month === 8) {
       return {
         ...prevObj,
-        Thang8: (prevObj.Thang8 || 0) + data.totalPrice
+        Thang8: (prevObj.Thang8 || 0) + price(data)
       }
     }
     if(Month === 9) {
       return {
         ...prevObj,
-        Thang9: (prevObj.Thang9 || 0) + data.totalPrice
+        Thang9: (prevObj.Thang9 || 0) + price(data)
       }
     }
     if(Month === 10) {
       return {
         ...prevObj,
-        Thang10: (prevObj.Thang10 || 0) + data.totalPrice
+        Thang10: (prevObj.Thang10 || 0) + price(data)
       }
     }
     if(Month === 11) {
       return {
         ...prevObj,
-        Thang11: (prevObj.Thang11 || 0) + data.totalPrice
+        Thang11: (prevObj.Thang11 || 0) + price(data)
       }
     }
     if(Month === 12) {
       return {
         ...prevObj,
-        Thang12: (prevObj.Thang12 || 0) + data.totalPrice
+        Thang12: (prevObj.Thang12 || 0) + price(data)
       }
     }
   }, {})
@@ -133,11 +140,11 @@ const computedDataTypeMonth = useMemo(() => {
       if(Month == nowMonth && Year == nowYear) {
       
         if (dailySales[isoDateStr]) {
-          dailySales[isoDateStr] += sale.totalPrice;
+          dailySales[isoDateStr] += price(sale);
          
         } 
         else {
-          dailySales[isoDateStr] = sale.totalPrice;
+          dailySales[isoDateStr] = price(sale);
           
         }
       }
@@ -162,7 +169,7 @@ const computedBookingTypeToDay = useMemo(() => {
     if(ngay === now && Month === nowMonth && Year === nowYear) {
       return {
         ...prevObj,
-        today: (prevObj.today || 0) + data.totalPrice
+        today: (prevObj.today || 0) + price(data)
       }
     }
     return prevObj
@@ -195,10 +202,10 @@ const filterRevenueByDate = () => {
 
     const ngay = isoDateStr
     if ( sale.statusOrder==="DONE" && result[ngay]) {
-      result[ngay] += sale.totalPrice;
+      result[ngay] += price(sale);
     }
     else {
-      result[ngay] = sale.totalPrice;
+      result[ngay] = price(sale);
     }
   })
   const _data = []
@@ -216,7 +223,7 @@ useEffect(() => {
     switch(filter){
       case 'today':
         result = [{
-          name: 'Hôm nay',
+          name: 'Today',
           total: computedBookingTypeToDay?.today
         }]
         break;
@@ -228,19 +235,19 @@ useEffect(() => {
       case 'thisYear':
         result = [
           {
-            name: 'January',
+            name: 'Jan',
             total: computedDataTypeYear.Thang1,
           },
           {
-            name: 'February',
+            name: 'Feb',
             total: computedDataTypeYear.Thang2,
           },
           {
-            name: 'March',
+            name: 'Mar',
             total: computedDataTypeYear.Thang3,
           },
           {
-            name: 'April',
+            name: 'Apr',
             total: computedDataTypeYear.Thang4,
           },
           {
@@ -248,31 +255,31 @@ useEffect(() => {
             total: computedDataTypeYear.Thang5,
           },
           {
-            name: 'June',
+            name: 'Jun',
             total: computedDataTypeYear.Thang6,
           },
           {
-            name: 'July',
+            name: 'Jul',
             total: computedDataTypeYear.Thang7,
           },
           {
-            name: 'August',
+            name: 'Aug',
             total: computedDataTypeYear.Thang8,
           },
           {
-            name: 'September',
+            name: 'Sep',
             total: computedDataTypeYear.Thang9,
           },
           {
-            name: 'October',
+            name: 'Oct',
             total: computedDataTypeYear.Thang10,
           },
           {
-            name: 'November',
+            name: 'Nov',
             total: computedDataTypeYear.Thang11,
           },
           {
-            name: 'December',
+            name: 'Dec',
             total: computedDataTypeYear.Thang12,
           },
         ];
