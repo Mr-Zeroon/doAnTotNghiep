@@ -1,6 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
 import User from "./pages/userPage/User";
-
 import Category from "./pages/categoryPage/Category";
 import CategoryAdd from "./pages/categoryPage/CategoryAdd";
 import UserEdit from "./pages/userPage/UserEdit";
@@ -18,7 +17,7 @@ import Places from './components/Map/MyMapComponent';
 import AddShipper from './pages/userPage/Add/AddShipper';
 import AddStore from './pages/userPage/Add/AddStore';
 import AddAdmin from './pages/userPage/Add/AddAdmin';
-import EditStore from './pages/userPage/Edit/EditStore';
+
 
 function App() {
   
@@ -37,7 +36,7 @@ function App() {
           <Route path="/user/addStore" element={<AddStore/>} />
           <Route path="/user/addAdmin" element={<AddAdmin/>} />
           <Route path="/user/admin/:editID" element={<UserEdit/>} />
-          <Route path="/user/store/:editID" element={<EditStore/>} />
+         
 
           <Route path="/category" element={<Category/>} />
           <Route path="/category/Add" element={<CategoryAdd/>} />

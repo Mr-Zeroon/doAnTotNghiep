@@ -15,6 +15,7 @@ import { toast } from 'react-toastify';
 const User = () => {
   const navigate = useNavigate();
   const [user,setUser] = useState([])
+  console.log(user,"user");
   const theme = useTheme();
   const colors = tokens(theme.palette.mode)
   const handleAddAdmin = (e)=>{
@@ -86,10 +87,7 @@ const User = () => {
             const currentRow = params.row;           
               navigate(`/user/admin/${currentRow.id}`)
           };
-          const handleEditStore = () => {
-            const currentRow = params.row;           
-              navigate(`/user/store/${currentRow.id}`)
-          };
+         
           const handleDelete = async (e) =>{
             const currentRow = params.row;                       
               await deleteDoc(doc(db, "/users", currentRow.id));

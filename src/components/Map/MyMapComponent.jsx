@@ -3,24 +3,23 @@ import {  useLoadScript } from '@react-google-maps/api';
 import "@reach/combobox/styles.css";
 import Map from './Map';
 
- const Places = ({handleLatLong}) => {
-  const [places,setPlaces] = useState("")
-  handleLatLong(places)
+ const Places = ({handleLatLong,setAddress}) => {
+  const [place,setPlace] = useState("")
+  const [addressd,setAddressd] = useState("")
+
+  handleLatLong(place)
   const handlePlaces = (value) =>{
-    setPlaces(value)
+    setPlace(value)
   }
+  setAddress(addressd)
   const [ libraries ] = useState(['places']);
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "AIzaSyCS3zaYT8njnV19W6gDGohy26RM9cg1j-c",
+    googleMapsApiKey: "AIzaSyAyRvcVrm7Y4RQ0vMje5WQA0JGy4L1TEMM",
     libraries
   })
 
   if(!isLoaded) return <div>Loading....</div>
-  return <Map handlePlaces={handlePlaces} />
+  return <Map handlePlaces={handlePlaces} setAddressd={setAddressd}/>
 }
-
-
-
-
 
 export default Places;

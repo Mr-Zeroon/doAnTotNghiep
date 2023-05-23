@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react'
 import Header from '../../components/Header/Header';
 import { tokens } from '../../theme';
 import { useNavigate } from 'react-router-dom';
-import { collection, getDocs, doc, deleteDoc, where, query, updateDoc } from "firebase/firestore";
+import { collection, getDocs, doc, where, query, updateDoc } from "firebase/firestore";
 import {db} from '../../firebase'
 import { toast } from 'react-toastify';
 const VoucherPage = () => {
+
   const navigate = useNavigate();
   const [voucher,setVoucher] = useState([])
   const theme = useTheme();
@@ -18,15 +19,20 @@ const VoucherPage = () => {
   }
   const fetchPost = async () => {  
     await getDocs(collection(db, "/vouchers"))
+    
         .then((querySnapshot)=>{               
             const newData = querySnapshot.docs
-                .map((doc) => ({...doc.data(), id:doc.id }));
+                .map((doc) => 
+                ({...doc.data(), id:doc.id })
+                );
             setVoucher(newData);
+            
         }) 
       }
   useEffect(()=>{
     fetchPost();
   }, [])
+  const voucherAdmin = voucher.filter(v=>v.typeVoucher == "ADMIN")
   const columns = [
     {field:"id", headerName:"ID",flex:0.5},
     {field:"name", headerName:"Name",flex:0.7,cellClassName:"name-column-cell"},
@@ -70,13 +76,20 @@ const VoucherPage = () => {
           };
           const handleDelete = async (e) =>{
             const currentRow = params.row;                       
-              await deleteDoc(doc(db, "/vouchers", currentRow.id));
-              toast.error("Delete Voucher Success");
+            if( currentRow.isDeleted === false){             
+              query(collection(db, "/vouchers"), where("id", "==", currentRow.id));
+               const user = doc(db, "/vouchers", currentRow.id);
+               await updateDoc(user, {
+                 isShow:false,
+                 isDeleted:true 
+               });
+               toast.success("Delete Voucher Success");
+           }
               fetchPost();
           }
           return (
             <Box>
-             { 
+             { currentRow.isDeleted===true?"":
               <Box direction="row" spacing={2} display="flex" gap="5px" >
                 <Button variant="contained" color="success" size="small" onClick={handleShow}>{currentRow.isShow===true?"Not Show":"Show"}</Button>
                 <Button variant="contained" color="success" size="small" onClick={handleEdit}>Edit</Button>
@@ -121,7 +134,7 @@ const VoucherPage = () => {
           color:`${colors.grey[100]} !important`
         },
       }}>
-        <DataGrid rows={voucher} columns={columns} components={{Toolbar:GridToolbar}}/>
+        <DataGrid rows={voucherAdmin} columns={columns} components={{Toolbar:GridToolbar}}/>
       </Box>
     </Box>
   )

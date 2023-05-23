@@ -28,7 +28,7 @@ const userSchema = yup.object().shape({
   fullName:yup.string().required("Did not enter the Full Name"),
   passWord:yup.string().required("Did not enter the Password"),
   email:yup.string().email("invalid Email").required("Did not enter the Email"),
-  address:yup.string().required("Did not enter the Address"),
+  
 })
 
 const AddStore = () => {
@@ -36,7 +36,9 @@ const AddStore = () => {
   const isNorMobile = useMediaQuery("(min-width:600px)")
   const [user,setUser] = useState([])
   const [latLng,setLapLng] = useState("")
-  console.log(latLng,"latLng");
+  const [address,setAddress] = useState("")
+
+  console.log(address,"address");
   var today = new Date();
   var date = today.getDate()+'-'+(today.getMonth()+1)+'-'+today.getFullYear();
   const fetchPost = async () => {  
@@ -60,6 +62,10 @@ const AddStore = () => {
     {
       toast.error("Email already exists")
     }
+    if(address=="")
+    {
+      toast.error("You do not enter an address")
+    }
     else{
       const newCityRef = doc(collection(db, "users"));
       var bcrypt = require('bcryptjs');
@@ -74,10 +80,11 @@ const AddStore = () => {
           typeUser:value.typeUser,
           isDeleted:false,
           createdAccount:date,
-          address:value.address,
-          openHour:"",
-          closeHour:"",
-          latLong:latLng
+          address:address,
+          openHour:"09:00",
+          closeHour:"21:00",
+          latLong:latLng,
+          
         });
         toast.success("Create Store Success");
         navigate("/user") 
@@ -153,19 +160,7 @@ const AddStore = () => {
                 helperText={touched.passWord && errors.passWord}
                 sx={{gridColumn:"span 4"}}
               /> 
-              <TextField 
-                fullWidth
-                variant='filled'
-                type='text'
-                label="Address"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.address}
-                name="address"
-                sx={{gridColumn:"span 4"}}
-              /> 
-
-                <Places handleLatLong={handleLatLong} sx={{gridColumn:"span 4"}}/>
+                <Places handleLatLong={handleLatLong} setAddress={setAddress} sx={{gridColumn:"span 4"}}/>
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color='secondary' variant='contained'>ADD</Button>

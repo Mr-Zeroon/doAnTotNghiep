@@ -10,6 +10,24 @@ const Chart = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode)
     const isNorMobile = useMediaQuery("(min-width:600px)")
+    let now = new Date().getDate()
+    function checkDate() 
+      {
+        if (now < 10) {
+          now = "0" + now;
+        }
+        return now;
+      }
+    let nowMonth = new Date().getMonth() + 1;
+    function checkTime() 
+      {
+        if (nowMonth < 10) {
+          nowMonth = "0" + nowMonth;
+        }
+        return nowMonth;
+      }
+    const nowYear = new Date().getFullYear()
+    const maxDate = `${nowYear}-${checkTime()}-${checkDate()}`;
   const [revenueData, setRevenueData] = useState([])
   const [dateFrom, setDateFrom] = useState('')
   const [dataTo, setDateTo] = useState('')
@@ -201,7 +219,7 @@ const filterRevenueByDate = () => {
     const isoDateStr = `${year}-${month}-${day}`;
 
     const ngay = isoDateStr
-    if ( sale.statusOrder==="DONE" && result[ngay]) {
+    if (result[ngay]) {
       result[ngay] += price(sale);
     }
     else {
@@ -209,6 +227,16 @@ const filterRevenueByDate = () => {
     }
   })
   const _data = []
+  // for (let i = 1; i <= now; i++){
+  //   for(let key in result) { 
+  //     const layngay = key.split('-')
+  //     const ngay = layngay[2]
+  //     if (i == ngay) {
+  //       result.push({name: key, total: result[key]})
+  //       break;
+  //     }
+  //   }
+  //}
   for(let key in result) {
     _data.push({name: key, total: result[key]})
   }   
@@ -220,6 +248,7 @@ useEffect(() => {
 
   const handleFilterByDate = (filter) => {
     let result = []
+    const now = new Date().getDate()
     switch(filter){
       case 'today':
         result = [{
@@ -228,9 +257,19 @@ useEffect(() => {
         }]
         break;
       case 'thisMonth':
-        for(let key in computedDataTypeMonth) {
-          result.push({name: key, total: computedDataTypeMonth[key]})
+        for (let i = 1; i <= now; i++){
+          for(let key in computedDataTypeMonth) { 
+            const layngay = key.split('-')
+            const ngay = layngay[2]
+            if (i == ngay) {
+              result.push({name: key, total: computedDataTypeMonth[key]})
+              break;
+            }
+          }
         }
+        // for(let key in computedDataTypeMonth) {  
+        //   result.push({name: key, total: computedDataTypeMonth[key]})
+        // }}
         break;
       case 'thisYear':
         result = [
@@ -297,11 +336,11 @@ useEffect(() => {
           <Box display="flex" marginLeft="20px" marginRight="40px">
             <Box display="flex" marginRight="20px">
                 <Typography variant='h5'sx={{color:colors.greenAccent[500]}} marginRight="10px">From Date</Typography>
-                <TextField size='small' type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)}/>
+                <TextField size='small' type="date" InputProps={{inputProps: { min: "2023-01-01", max: maxDate} }} value={dateFrom} onChange={(e) => setDateFrom(e.target.value)}/>
             </Box>
             <Box display="flex" >
                 <Typography variant='h5' sx={{color:colors.greenAccent[500]}} marginRight="10px">To Date</Typography>
-                <TextField size='small' type="date" value={dataTo} onChange={(e) => setDateTo(e.target.value)}/>
+                <TextField size='small' type="date" InputProps={{inputProps: { min: "2023-01-01", max: maxDate} }} value={dataTo} onChange={(e) => setDateTo(e.target.value)}/>
             </Box>
           </Box>
         </form>

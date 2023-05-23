@@ -68,6 +68,18 @@ const VoucherAdd = () => {
     {
       toast.error("Code Already Exists")
     }
+    else if(value.discountMoney<0)
+    {
+      toast.error("Discount Money must be greater than 0")
+    }
+    else if(value.minOrderPrice<0)
+    {
+      toast.error("Min Order Price must be greater than 0")
+    }
+    else if(value.limitMax<0)
+    {
+      toast.error("Limit Max must be greater than 0")
+    }
     else {
         const newCityRef = doc(collection(db, "vouchers"));
         await setDoc(newCityRef,{
@@ -82,7 +94,8 @@ const VoucherAdd = () => {
           image:images,
           listCustomer:[],
           isDeleted:false,
-          isShow:true
+          isShow:true,
+          typeVoucher:"ADMIN"
         });
         toast.success("Create Voucher Success");
         navigate("/voucher") 

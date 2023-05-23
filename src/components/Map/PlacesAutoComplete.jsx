@@ -11,7 +11,7 @@ import usePlacesAutocomplete, {
       ComboboxOption,
   } from "@reach/combobox";
 
-const PlacesAutoComplete = ({setSelected,setMaps}) =>{
+const PlacesAutoComplete = ({setSelected,setMaps,setAddress}) =>{
     const {
       ready,
       value,
@@ -19,7 +19,8 @@ const PlacesAutoComplete = ({setSelected,setMaps}) =>{
       setValue,
       clearSuggestions,
     } = usePlacesAutocomplete();
-  
+    const address = value;
+   
     const handleSelect = async (address)=> {
       setValue(address,false);
       clearSuggestions();
@@ -28,6 +29,7 @@ const PlacesAutoComplete = ({setSelected,setMaps}) =>{
       const latLong = lat + ";" + lng
       setSelected(latLong)
       setMaps({ lat , lng })
+      setAddress(address)
     }
   
     return (
