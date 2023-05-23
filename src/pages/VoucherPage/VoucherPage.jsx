@@ -8,7 +8,6 @@ import { collection, getDocs, doc, where, query, updateDoc } from "firebase/fire
 import {db} from '../../firebase'
 import { toast } from 'react-toastify';
 const VoucherPage = () => {
-
   const navigate = useNavigate();
   const [voucher,setVoucher] = useState([])
   const theme = useTheme();
@@ -26,7 +25,6 @@ const VoucherPage = () => {
                 ({...doc.data(), id:doc.id })
                 );
             setVoucher(newData);
-            
         }) 
       }
   useEffect(()=>{

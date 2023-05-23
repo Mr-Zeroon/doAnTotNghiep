@@ -37,7 +37,7 @@ const Sidebars = () => {
     console.log("click");
   }
   return (
-    <Box height="670px"
+    <Box height="700px"
       sx={{
         "& .pro-sidebar-inner": {
           background: `${colors.primary[400]} !important` 
@@ -91,7 +91,7 @@ const Sidebars = () => {
                   alt="profile-user" 
                   width="100px" 
                   height="100px" 
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLe5PABjXc17cjIMOibECLM7ppDwMmiDg6Dw&usqp=CAU" 
+                  src="https://static.vecteezy.com/system/resources/previews/011/468/885/original/food-logo-spoon-fork-icon-illustration-symbol-for-fast-delivery-app-restaurant-template-free-vector.jpg" 
                   style={{cursor:"pointer" , borderRadius:"50%"}}
                   />
                 </Box>
