@@ -38,6 +38,8 @@ const VoucherAdd = () => {
     minOrderPrice:"",
     limitMax:"",
   }
+  const eVoucher = voucher.filter(u=> u.id == editID)
+ 
   const handleImageChange = (e) => {
     if (e.target.files[0]) {
         const id = uuidv1()
@@ -125,7 +127,7 @@ const VoucherAdd = () => {
                 label="Name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.fullName}
+                value={values.name}
                 name="name"
                 error={!!touched.name && !!errors.name}
                 helperText={touched.name && errors.name}

@@ -197,6 +197,7 @@ const computedBookingTypeToDay = useMemo(() => {
 
 const filterRevenueByDate = () => {
   const result = {}
+  let now = new Date().getDate()
   revenueData.filter(data => {
     const dateStr = data.timePeding;
 
@@ -227,19 +228,19 @@ const filterRevenueByDate = () => {
     }
   })
   const _data = []
-  // for (let i = 1; i <= now; i++){
-  //   for(let key in result) { 
-  //     const layngay = key.split('-')
-  //     const ngay = layngay[2]
-  //     if (i == ngay) {
-  //       result.push({name: key, total: result[key]})
-  //       break;
-  //     }
-  //   }
-  //}
-  for(let key in result) {
-    _data.push({name: key, total: result[key]})
-  }   
+  for (let i = 1; i <= now; i++){
+    for(let key in result) { 
+      const layngay = key.split('-')
+      const ngay = layngay[2]
+      if (i == ngay) {
+        _data.push({name: key, total: result[key]})
+        break;
+      }
+    }
+  }
+  // for(let key in result) {
+  //   _data.push({name: key, total: result[key]})
+  // }   
  setData(_data)
 }
 useEffect(() => {

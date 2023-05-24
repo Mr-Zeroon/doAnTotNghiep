@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Formik } from 'formik';
 import { Box, TextField,Button } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../../components/Header/Header';
-import { collection, doc, updateDoc, query, where } from "firebase/firestore";
+import { collection, doc, updateDoc, query, where, getDocs } from "firebase/firestore";
 import {db, storage} from '../../firebase';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { toast } from 'react-toastify';
@@ -16,10 +16,27 @@ const CategoryEdit = () => {
   const {editID} = useParams()
   const [names, setNames] = useState("")
   const [images, setImages] = useState("")
-  console.log(names,"ads");
-  console.log(images,"adss");
+  const [categoriData, setCategoriData] = useState([]);
+
   const isNorMobile = useMediaQuery("(min-width:600px)")
 
+
+  const fetchPost = async () => {
+    await getDocs(collection(db, "/categorys"))
+        .then((querySnapshot)=>{               
+            const newData = querySnapshot.docs
+                .map((doc) => ({...doc.data(), id:doc.id }));
+            setCategoriData(newData);                
+        })
+   
+  }
+
+  useEffect(()=>{
+    fetchPost();
+  }, [])
+
+  const eCategory = categoriData.filter(u=>u.id==editID)
+  console.log(eCategory,"as");
   const handleImageChange = (e) => {
       if (e.target.files[0]) {
           const id = uuidv1()
@@ -43,7 +60,6 @@ const CategoryEdit = () => {
         name:names,
         thumnail:images,  
       });
-      console.log(category,"nha");
       toast.success("Update Category Success");
       navigate("/category") 
   }
